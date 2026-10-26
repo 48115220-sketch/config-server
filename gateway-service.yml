@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+          order: 10
+
+        - id: personal-service
+          uri: lb://PERSONAL-SERVICE
+          predicates:
+            - Path=/admin/**
+          order: 10
+
+        - id: vuelos-service
+          uri: lb://VUELOS-SERVICE
+          predicates:
+            - Path=/vuelos/**
+          order: 10
+
+        - id: aviones-service
+          uri: lb://AVIONES-SERVICE
+          predicates:
+            - Path=/aviones/**
+          order: 10
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: "1. Autenticación (auth-service)"
+        url: "/auth/v3/api-docs"
+      - name: "2. Personal de Vuelo (personal-service)"
+        url: "/admin/v3/api-docs"
+      - name: "3. Vuelos (vuelos-service)"
+        url: "/vuelos/v3/api-docs"
+      - name: "4. Aviones (aviones-service)"
+        url: "/aviones/v3/api-docs"
